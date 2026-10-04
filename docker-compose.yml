@@ -1,29 +1,28 @@
-version: "3"
-
+# Run with the app env files so ports and origins have a single source of truth:
+#   docker compose --env-file apps/api/.env --env-file apps/web/.env up --build
 services:
-  web:
-    container_name: web
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-    restart: always
-    ports:
-      - 3000:3000
-    networks:
-      - app_network
   api:
-    container_name: api
     build:
       context: .
-      dockerfile: ./apps/api/Dockerfile
-    restart: always
+      dockerfile: apps/api/Dockerfile
+    env_file: apps/api/.env
+    environment:
+      APP_ENV: production
+      API_HOST: 0.0.0.0
     ports:
-      - 3001:3001
-    networks:
-      - app_network
+      - "${API_PORT:?}:${API_PORT:?}"
+    restart: unless-stopped
 
-# Define a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
-networks:
-  app_network:
-    external: true
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_HOST: ${NEXT_PUBLIC_API_HOST:?}
+    environment:
+      PORT: ${WEB_PORT:?}
+    ports:
+      - "${WEB_PORT:?}:${WEB_PORT:?}"
+    depends_on:
+      - api
+    restart: unless-stopped

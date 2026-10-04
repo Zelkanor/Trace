@@ -1,0 +1,9 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.pytest_cache": true,
+    "**/.turbo": true,
+    "**/__pycache__": true,
+    "**/.venv": true
+  }
+}

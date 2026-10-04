@@ -1,76 +1,87 @@
-# Turborepo Docker starter
+# TRACE-Laya
 
-This is a community-maintained example. If you experience a problem, please submit a pull request with a fix. GitHub Issues will be closed.
+**Temporal Risk Attribution & Claim Evidence**
 
-## Using this example
+A replay-first, evidence-aware event-to-portfolio-stress project.
+The risk object is an evolving **event hypothesis**, not an individual article.
 
-Run the following command:
+Planned flow: document → claim → event → evidence and semantic decisions →
+deterministic policy → exposure → conditional stress → explanation.
 
-```sh
-npx create-turbo@latest -e with-docker
-```
+## Workspace and tools
 
-## What's inside?
+- `apps/api`: Python 3.11, FastAPI, Pydantic settings, Uvicorn, pytest.
+- `apps/web`: Next.js App Router, React, TypeScript, native fetch.
+- `docker-compose.yml`: exactly two services, `api` and `web`.
 
-This Turborepo includes the following:
+## Local setup
 
-### Apps and Packages
-
-- `web`: a [Next.js](https://nextjs.org/) app
-- `api`: an [Express](https://expressjs.com/) server
-- `@repo/ui`: a React component library
-- `@repo/logger`: Isomorphic logger (a small wrapper around `console.log`)
-- `@repo/eslint-config`: ESLint presets
-- `@repo/typescript-config`: shared TypeScript configurations
-- `@repo/jest-presets`: Jest configurations
-
-Each package and app is written in [TypeScript](https://www.typescriptlang.org/).
-
-### Docker
-
-This repo is configured to be built with Docker Compose. To build all apps in this repo:
+Run commands from the repository root unless stated otherwise.
+Create local environment files without overwriting existing ones:
 
 ```sh
-# Install dependencies
+test -f apps/api/.env || cp apps/api/.env.example apps/api/.env
+test -f apps/web/.env || cp apps/web/.env.example apps/web/.env
+uv sync --locked --all-packages --all-groups
 bun install --frozen-lockfile
-
-# Create a network that allows containers to communicate using their
-# container names as hostnames
-docker network create app_network
-
-# Build the production images
-docker compose build
-
-# Start production in detached mode
-docker compose up -d
 ```
 
-Open http://localhost:3000.
+The examples set the API to `http://localhost:3001` and the web app to
+`http://localhost:3000`. Keep `WEB_ORIGIN` in the API environment aligned with
+the browser origin, and `NEXT_PUBLIC_API_HOST` in the web environment aligned
+with the browser-accessible API address. Keep actual `.env` files private.
 
-To shut down all running containers:
+The API also accepts `APP_ENV=development|production|test`, `LOG_LEVEL`,
+`API_HOST`, `API_PORT`, and `ALLOWED_HOSTS`. Process environment values override
+`apps/api/.env`. The web scripts load `apps/web/.env`, including `WEB_PORT`.
 
 ```sh
-docker compose down
+bun run dev
 ```
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-This example includes optional remote caching. In the Dockerfiles of the apps, uncomment the build arguments for `TURBO_TEAM` and `TURBO_TOKEN`. Then, pass these build arguments to your Docker build.
-
-You can test this behavior using a command like:
+Or run `bun run dev:api` and `bun run dev:web` in separate terminals.
+Open <http://localhost:3000> and select **Check API**. Development API docs are
+at <http://localhost:3001/docs>; production disables them.
 
 ```sh
-docker build -f apps/web/Dockerfile . --build-arg TURBO_TEAM="your-team-name" --build-arg TURBO_TOKEN="your-token" --no-cache
+curl --fail http://localhost:3001/health
 ```
 
-### Utilities
+## Docker
 
-This Turborepo has some additional tools already set up for you:
+Create the two local environment files as above. Stop local servers using the
+same ports, then run:
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Jest](https://jestjs.io) test runner for all things JavaScript
-- [Prettier](https://prettier.io) for code formatting
+```sh
+bun run docker:up
+```
+
+This passes both app environment files to Compose and builds/starts `api` and
+`web`. No external network needs to be created manually. To stop the services:
+
+```sh
+docker compose --env-file apps/api/.env --env-file apps/web/.env down
+```
+
+`NEXT_PUBLIC_API_HOST` is embedded into browser code at web build time. Rebuild
+the web image after changing it. Use a browser-accessible address such as
+`http://localhost:3001`, not the container-only hostname `api`.
+
+The current Compose port mappings publish on all host interfaces. This prototype
+has no authentication: use a trusted development machine/network, not a public
+deployment. Security headers and host validation do not replace authentication.
+
+## Checks
+
+```sh
+# Bypass Turbo task caching when checking current behavior.
+bun run test --force
+bun run lint --force
+
+# Production web build, including Next.js TypeScript validation.
+# Set the public URL explicitly; the API does not need to be running.
+(cd apps/web && NEXT_PUBLIC_API_HOST=http://localhost:3001 bun run build)
+
+# Verify the two Compose service definitions without starting containers.
+docker compose --env-file apps/api/.env --env-file apps/web/.env config --services
+```

@@ -1,11 +1,15 @@
 {
-  "name": "with-docker",
+  "name": "trace",
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "setup": "uv sync --all-packages && bun install",
     "build": "turbo run build",
     "clean": "turbo run clean",
+    "docker:up": "docker compose --env-file apps/api/.env --env-file apps/web/.env up --build",
     "dev": "turbo run dev",
+    "dev:api": "turbo run dev --filter=api",
+    "dev:web": "turbo run dev --filter=web",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "test": "turbo run test"
@@ -15,7 +19,7 @@
     "turbo": "^2.11.7"
   },
   "engines": {
-    "node": ">=24.21.0"
+    "node": ">=24.0.0"
   },
   "devEngines": {
     "packageManager": {
@@ -24,7 +28,6 @@
     }
   },
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/*"
   ]
 }

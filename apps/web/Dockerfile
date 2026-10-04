@@ -1,48 +1,36 @@
-ARG NODE_VERSION=24.21.0
-FROM node:${NODE_VERSION}-slim AS base
+# syntax=docker/dockerfile:1
+# Build context: repository root (the bun workspace lives there).
 
-# This Dockerfile is copy-pasted into our main docs at /docs/handbook/deploying-with-docker.
-# Make sure you update both files!
-
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-# Set working directory
+FROM node:24-alpine AS base
+COPY --from=oven/bun:1-alpine /usr/local/bin/bun /usr/local/bin/bun
 WORKDIR /app
 
-# ---
-FROM base AS prepare
-RUN yarn global add turbo
-COPY . .
-# Add lockfile and package.json's of isolated subworkspace
-RUN turbo prune web --docker
-
-# ---
 FROM base AS builder
-# First install the dependencies (as they change less often)
-COPY --from=prepare /app/out/json/ .
-RUN yarn install --frozen-lockfile
-# Build the project
-COPY --from=prepare /app/out/full/ .
+ENV NEXT_TELEMETRY_DISABLED=1
+# NEXT_PUBLIC_* values are inlined at build time, so they are build args.
+ARG NEXT_PUBLIC_API_HOST
+ENV NEXT_PUBLIC_API_HOST=$NEXT_PUBLIC_API_HOST
 
-# Uncomment and use build args to enable remote caching
-# ARG TURBO_TEAM
-# ENV TURBO_TEAM=$TURBO_TEAM
+# Dependencies first: cached until a manifest or the lockfile changes.
+COPY package.json bun.lock ./
+COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile --filter web
 
-# ARG TURBO_TOKEN
-# ENV TURBO_TOKEN=$TURBO_TOKEN
+COPY apps/web apps/web
+WORKDIR /app/apps/web
+RUN bun run build
 
-RUN yarn turbo build
-
-# ---
-FROM node:${NODE_VERSION}-alpine AS runner
-# Don't run production as root for security reasons
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-USER nextjs
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
-
-CMD node apps/web/server.js
+FROM node:24-alpine AS runner
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    HOSTNAME=0.0.0.0 \
+    PORT=3000
+WORKDIR /app
+USER node
+# Standalone output contains only the traced runtime dependencies.
+COPY --from=builder --chown=node:node /app/apps/web/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/web/.next/static apps/web/.next/static
+COPY --from=builder --chown=node:node /app/apps/web/public apps/web/public
+CMD ["node", "apps/web/server.js"]

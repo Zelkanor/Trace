@@ -5,19 +5,11 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**",
-        "!.next/dev/**",
-        "public/dist/**"
-      ],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"],
       "env": ["NEXT_PUBLIC_API_HOST"]
     },
     "test": {},
-    "lint": {
-      "dependsOn": ["^build"]
-    },
+    "lint": {},
     "dev": {
       "cache": false,
       "persistent": true
