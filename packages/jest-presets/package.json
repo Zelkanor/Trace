@@ -1,0 +1,18 @@
+{
+  "name": "@repo/jest-presets",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "files": [
+    "node/esbuild-transformer.js",
+    "node/jest-preset.js"
+  ],
+  "exports": {
+    "./node": "./node/jest-preset.js",
+    "./node/jest-preset": "./node/jest-preset.js"
+  },
+  "dependencies": {
+    "esbuild": "0.28.2",
+    "jest": "30.5.1"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "library.js",
+    "next.js",
+    "react-internal.js",
+    "server.js"
+  ],
+  "devDependencies": {
+    "@babel/core": "8.0.1",
+    "@babel/eslint-parser": "8.0.1",
+    "@babel/plugin-syntax-jsx": "8.0.1",
+    "@babel/preset-typescript": "8.0.1",
+    "@next/eslint-plugin-next": "16.3.4",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-config-turbo": "2.10.12",
+    "typescript": "7.0.2"
+  }
+}
