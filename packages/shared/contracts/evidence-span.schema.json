@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A quote located in an immutable document text version.\n\nOffsets are zero-based, end-exclusive Unicode code-point offsets into\n``raw_text`` (Python ``str`` indexing). JavaScript counts UTF-16 code units,\nso clients should display ``quote`` rather than slicing with these offsets.",
+  "properties": {
+    "document_content_sha256": {
+      "description": "Identifies the text version these offsets refer to.",
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Document Content Sha256",
+      "type": "string"
+    },
+    "document_id": {
+      "description": "Opaque, nonblank, caller-supplied identifier.",
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "end_char": {
+      "exclusiveMinimum": 0,
+      "title": "End Char",
+      "type": "integer"
+    },
+    "quote": {
+      "description": "Nonempty exact text.",
+      "minLength": 1,
+      "title": "Quote",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "trace-core-v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "start_char": {
+      "minimum": 0,
+      "title": "Start Char",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "document_id",
+    "document_content_sha256",
+    "start_char",
+    "end_char",
+    "quote"
+  ],
+  "title": "EvidenceSpan",
+  "type": "object"
+}

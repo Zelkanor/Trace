@@ -1,0 +1,102 @@
+{
+  "$defs": {
+    "SourceFamily": {
+      "description": "Coarse source class. Not an independence group.",
+      "enum": [
+        "SEC_REGULATORY",
+        "ISSUER_OFFICIAL",
+        "NEWS_WIRE",
+        "NEWS_OUTLET",
+        "REPLAY_SOCIAL",
+        "UNKNOWN"
+      ],
+      "title": "SourceFamily",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A source/provenance identity with *supplied* classifications.\n\nThis model stores classifications; it does not decide them. ``None`` means\nunknown. In particular, ``independence_group_id=None`` is not\n\"independent\", and independence is never derived from ``source_family``.",
+  "properties": {
+    "independence_group_id": {
+      "anyOf": [
+        {
+          "description": "Opaque, nonblank, caller-supplied identifier.",
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Independence Group Id"
+    },
+    "origin_id": {
+      "anyOf": [
+        {
+          "description": "Opaque, nonblank, caller-supplied identifier.",
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Origin Id"
+    },
+    "quoted_source_id": {
+      "anyOf": [
+        {
+          "description": "Opaque, nonblank, caller-supplied identifier.",
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Quoted Source Id"
+    },
+    "schema_version": {
+      "const": "trace-core-v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_family": {
+      "$ref": "#/$defs/SourceFamily"
+    },
+    "source_id": {
+      "description": "Opaque, nonblank, caller-supplied identifier.",
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "source_tier": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Tier"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_id",
+    "source_family"
+  ],
+  "title": "SourceRecord",
+  "type": "object"
+}

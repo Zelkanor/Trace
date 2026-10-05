@@ -5,5 +5,8 @@
     "**/.turbo": true,
     "**/__pycache__": true,
     "**/.venv": true
-  }
+  },
+  "python.testing.pytestArgs": ["apps/api/tests/api"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

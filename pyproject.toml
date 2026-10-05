@@ -9,3 +9,8 @@ package = false
 
 [tool.uv.workspace]
 members = ["apps/api"]
+
+[tool.pytest.ini_options]
+testpaths = ["apps/api/tests/api"]
+pythonpath = ["apps/api"]
+addopts = ["--import-mode=importlib"]

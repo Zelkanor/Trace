@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Immutable raw document text with provenance.\n\n``raw_text`` is retained exactly as supplied (never trimmed or normalized);\nnormalization derives a separate representation later.",
+  "properties": {
+    "content_sha256": {
+      "description": "SHA-256 of the UTF-8 encoding of raw_text.",
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Content Sha256",
+      "type": "string"
+    },
+    "document_id": {
+      "description": "Opaque, nonblank, caller-supplied identifier.",
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "is_replay": {
+      "title": "Is Replay",
+      "type": "boolean"
+    },
+    "is_synthetic": {
+      "title": "Is Synthetic",
+      "type": "boolean"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Explicit publication time, or null when unknown. Never substituted with observed_at/retrieved_at.",
+      "title": "Published At"
+    },
+    "raw_text": {
+      "description": "Exact decoded text retained as evidence; may be empty.",
+      "title": "Raw Text",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "title": "Retrieved At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "trace-core-v0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "Opaque, nonblank, caller-supplied identifier.",
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "source_url": {
+      "anyOf": [
+        {
+          "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://[^\\s/?#]+[^\\s]*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Url"
+    }
+  },
+  "required": [
+    "schema_version",
+    "document_id",
+    "source_id",
+    "published_at",
+    "observed_at",
+    "retrieved_at",
+    "raw_text",
+    "content_sha256",
+    "is_replay",
+    "is_synthetic"
+  ],
+  "title": "DocumentRecord",
+  "type": "object"
+}

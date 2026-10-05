@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "uv run --package api python -m app",
     "start": "APP_ENV=production uv run --package api python -m app",
-    "lint": "uv run --package api python -m compileall -q app tests",
-    "test": "uv run --package api pytest",
-    "clean": "rm -rf .pytest_cache app/__pycache__ app/*/__pycache__ tests/__pycache__"
+    "lint": "uv run --package api python -m compileall -q app tests/api",
+    "test": "uv run --package api pytest -c ../../pyproject.toml tests/api",
+    "clean": "rm -rf .pytest_cache ../../.pytest_cache app/__pycache__ app/*/__pycache__ tests/api/__pycache__ tests/api/unit/__pycache__ tests/api/integration/__pycache__"
   }
 }
