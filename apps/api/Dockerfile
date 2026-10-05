@@ -26,7 +26,11 @@ ENV PATH="/app/.venv/bin:$PATH" \
     APP_ENV=production \
     API_HOST=0.0.0.0
 WORKDIR /app
-RUN useradd --system --uid 1001 --no-create-home api
+RUN useradd --system --uid 1001 --no-create-home api \
+    && mkdir -p /app/data \
+    && chown api:api /app/data
 COPY --from=builder --chown=api:api /app/.venv .venv
 USER api
+# SQLite lives on a mounted volume (see docker-compose.yml); TRACE_DB_PATH points here.
+VOLUME ["/app/data"]
 CMD ["python", "-m", "app"]

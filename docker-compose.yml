@@ -9,6 +9,10 @@ services:
     environment:
       APP_ENV: production
       API_HOST: 0.0.0.0
+      # Absolute: the installed package has no meaningful workspace root in the container.
+      TRACE_DB_PATH: /app/data/trace.sqlite3
+    volumes:
+      - trace-data:/app/data
     ports:
       - "${API_PORT:?}:${API_PORT:?}"
     restart: unless-stopped
@@ -26,3 +30,6 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+
+volumes:
+  trace-data:
